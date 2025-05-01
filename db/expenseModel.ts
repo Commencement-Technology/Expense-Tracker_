@@ -73,7 +73,6 @@ export async function getExpenseById(id: string): Promise<ExpenseRecord | undefi
     : undefined;
 }
 
-// ✅ UPDATE
 export async function updateExpense({
   id,
   title,
@@ -83,11 +82,10 @@ export async function updateExpense({
   type,
 }: Omit<ExpenseRecord, 'created_at'>) {
   await db.runAsync(
-    `UPDATE expenses SET title = ?, amount = ?, is_synced = ?, date = ?, is_expense = ?, created_at = CURRENT_TIMESTAMP WHERE id = ?,type=?`,
+    `UPDATE expenses SET title = ?, amount = ?, is_synced = ?, date = ?, type = ?, created_at = CURRENT_TIMESTAMP WHERE id = ?`,
     [title, amount, is_synced ? 1 : 0, date, type, id]
   );
 }
-
 
 // ✅ DELETE
 // export async function deleteExpense(id: string) {

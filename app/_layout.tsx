@@ -5,20 +5,40 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
-
+import NetInfo from '@react-native-community/netinfo';
 import { useColorScheme } from '@/hooks/useColorScheme';
-
+import * as DB from '../db/SqLiteDb';
+import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
+import { syncExpensesWithBackend } from '../utils/syncManager';
+import Toast from 'react-native-toast-message';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+DB.createTable();
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    bold: require('../assets/fonts/Lemon-Regular.ttf'),
   });
+  useDrizzleStudio(DB.db);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      NetInfo.fetch().then(state => {
+        if (state.isConnected) {
+          syncExpensesWithBackend(); // your sync function
+        } else {
+          console.log('No internet connection');
+        }
+      });
+    }, 3000); // 3 seconds
+
+    return () => clearInterval(interval); // cleanup
+  }, []);
 
   useEffect(() => {
     if (loaded) {
+
       SplashScreen.hideAsync();
     }
   }, [loaded]);
@@ -27,6 +47,8 @@ export default function RootLayout() {
     return null;
   }
 
+
+
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
@@ -34,6 +56,7 @@ export default function RootLayout() {
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />
+      <Toast />
     </ThemeProvider>
   );
 }

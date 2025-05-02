@@ -11,6 +11,8 @@ import * as DB from '../db/SqLiteDb';
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
 import { syncExpensesWithBackend } from '../utils/syncManager';
 import Toast from 'react-native-toast-message';
+import { toastConfig } from "../components/Toast"; // path to your file
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
@@ -57,6 +59,7 @@ export default function RootLayout() {
       </Stack>
       <StatusBar style="auto" />
       <Toast />
+      <Toast config={toastConfig} />
     </ThemeProvider>
   );
 }

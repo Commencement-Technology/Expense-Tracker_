@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import {
   View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Modal,
   SafeAreaView,
-  Platform
+  Platform,
+  Button
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import 'react-native-get-random-values'; // 👈 must be first
@@ -17,6 +18,7 @@ import { syncExpensesWithBackend } from '../../utils/syncManager';
 import type { ExpenseRecord } from '../../db/expenseModel';
 import { Feather, AntDesign, MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+
 
 const CRUDScreen = () => {
   const [title, setTitle] = useState('');
@@ -84,11 +86,23 @@ const CRUDScreen = () => {
     setType(item.type); // Set the type from the item
   };
 
-  const handleDelete = async (id: string) => {
-    await deleteExpense(id);
-    await loadExpenses();
+  const handleDelete = (id: string) => {
+    Toast.show({
+      type: "custom_delete",
+      position: "bottom",
+      text1: "Delete Expense",
+      props: {
+        id,
+        onConfirm: async (confirmedId: string) => {
+          await deleteExpense(confirmedId);
+          await loadExpenses();
+        },
+        onCancel: () => Toast.hide(),
+      },
+    });
   };
-
+  
+    
   const handleSync = async () => {
     await syncExpensesWithBackend();
     await loadExpenses();
